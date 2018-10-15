@@ -1,4 +1,4 @@
-; controller.asm
+; .\controller.asm
 LoadSpritesLoop                  = $C059
 LoadPalettes                     = $C03D
 LatchController                  = $C07B
