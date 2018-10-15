@@ -22,8 +22,7 @@ controller_state_a      .rs 1
 controller_state_b      .rs 1
 controller_state_select .rs 1
 controller_state_start  .rs 1
-controller_state_       .rs 1
-controller_state_a      .rs 1
+
 
 
     .bank 0
