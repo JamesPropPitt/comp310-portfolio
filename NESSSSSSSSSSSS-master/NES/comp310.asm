@@ -14,6 +14,17 @@ PPUSCROLL = $2005
 PPUADDR   = $2006
 PPUDATA   = $2007
 OAMDMA    = $4014
+CONTROLLER1 = $4016
+CONTROLLER2 = $4017
+
+    .rsset $0010
+controller_state_a      .rs 1
+controller_state_b      .rs 1
+controller_state_select .rs 1
+controller_state_start  .rs 1
+controller_state_       .rs 1
+controller_state_a      .rs 1
+
 
     .bank 0
     .org $C000
@@ -91,10 +102,18 @@ vblankwait2:
 
 
     ;Wrting the background colour
-    LDA #$1d
+    LDA #$30
+    STA PPUDATA
+    LDA #$0A
+    STA PPUDATA
+    LDA #$17
+    STA PPUDATA
+    LDA #$28
+    STA PPUDATA
+    LDA #$39
     STA PPUDATA
 
-    ;Write Sprite Data
+    ;Write Sprite Data#1
     LDA #120    ; Y position
     STA $0200
     LDA #0      ; Tile Number
@@ -103,6 +122,16 @@ vblankwait2:
     STA $0202
     LDA #128    ;X position
     STA $0203
+
+    ;Write Sprite Data#2
+    LDA #60     ; Y position
+    STA $0204
+    LDA #0      ; Tile Number
+    STA $0205
+    LDA #0      ; Attributes
+    STA $0206
+    LDA #190    ;X position
+    STA $0207
 
     LDA #%10000000 ; Enable Non Maskable interrupt(NMI)
     STA PPUCTRL
@@ -121,6 +150,56 @@ forever:
 
 ; NMI is called on every frame
 NMI:
+    ;Initialise controls
+    LDA #1
+    STA CONTROLLER1
+    LDA #0
+    STA CONTROLLER1
+
+    LDX #0
+ReadController:
+    LDA CONTROLLER1
+    AND #%00000001
+    STA controller_state_a, x 
+    INX
+    CPX #8
+    BNE ReadController
+
+    ;Read A button
+    LDA CONTROLLER1
+    AND #$00000001
+    BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
+    LDA $0203
+    CLC 
+    ADC #1
+    STA $0203
+ReadA_Done:
+
+    ;Read B button
+    LDA CONTROLLER1
+    AND #$00000001
+    BEQ ReadB_Done ; if Controller 1's B button is pressed, execute following lines.
+    LDA $0200
+    CLC 
+    ADC #1
+    STA $0200
+ReadB_Done:
+
+    LDA CONTROLLER1
+    LDA CONTROLLER1
+    LDA CONTROLLER1
+    LDA CONTROLLER1
+    LDA CONTROLLER1
+    LDA CONTROLLER1
+
+    ;Make the sprites move
+    LDA $0204
+    CLC 
+    ADC #2
+    STA $0204
+
+
+    ;Copy sprite data to PPU
     LDA #0
     STA OAMADDR
     LDA #$02
@@ -142,4 +221,5 @@ NMI:
 
     .bank 2
     .org $0000
-    ; TODO: add graphics
+    .incbin "comp310.chr"
+
