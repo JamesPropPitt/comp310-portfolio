@@ -1,9 +1,11 @@
-$C0D3#ReadB_Done#
-$C0C3#ReadA_Done#
+$C0D3#ReadDown_Done#
+$C0E3#ReadLeft_Done#
+$C0F3#ReadRight_Done#
 $C017#vblankwait1#
 $C03A#vblankwait2#
 $C01D#clrmem#
 $C000#RESET#
 $C09A#NMI#
 $C0A6#ReadController#
+$C0C3#ReadUp_Done#
 $C097#forever#

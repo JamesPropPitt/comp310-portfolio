@@ -22,7 +22,20 @@ controller_state_a      .rs 1
 controller_state_b      .rs 1
 controller_state_select .rs 1
 controller_state_start  .rs 1
+controller_state_up     .rs 1
+controller_state_down   .rs 1
+controller_state_left   .rs 1
+controller_state_right  .rs 1
 
+    .rsset $0020
+sprite_player           .rs 4
+sprite_bullet           .rs 4
+
+    .rsset $0000
+SPRITE_Y                .rs 1
+SPRITE_TILE             .rs 1
+SPRITE_ATTRIB           .rs 1
+SPRITE_X                .rs 1
 
 
     .bank 0
@@ -164,33 +177,61 @@ ReadController:
     CPX #8
     BNE ReadController
 
-    ;Read A button
-    LDA CONTROLLER1
+    ;Read Up Arrow
+    LDA controller_state_up
     AND #$00000001
-    BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
-    LDA $0203
+    BEQ ReadUp_Done ; if Controller 1's up button is pressed, execute following lines.
+    LDA sprite_player + SPRITE_Y
+    CLC
+    ADC #-1
+    STA sprite_player + SPRITE_Y
+ReadUp_Done:
+
+    ;Read Down Arrow
+    LDA controller_state_down
+    AND #$00000001
+    BEQ ReadDown_Done ; if Controller 1's down button is pressed, execute following lines.
+    LDA sprite_player + SPRITE_Y
     CLC 
     ADC #1
-    STA $0203
-ReadA_Done:
+    STA sprite_player + SPRITE_Y
+ReadDown_Done:
 
-    ;Read B button
-    LDA CONTROLLER1
+    ;Read Left Arrow
+    LDA controller_state_left
     AND #$00000001
-    BEQ ReadB_Done ; if Controller 1's B button is pressed, execute following lines.
-    LDA $0200
+    BEQ ReadLeft_Done ; if Controller 1's left button is pressed, execute following lines.
+    LDA sprite_player + SPRITE_X
+    CLC 
+    ADC #-1
+    STA sprite_player + SPRITE_X
+ReadLeft_Done:
+
+    ;Read Right Arrow
+    LDA controller_state_right
+    AND #$00000001
+    BEQ ReadRight_Done ; if Controller 1's right button is pressed, execute following lines.
+    LDA sprite_player + SPRITE_X
     CLC 
     ADC #1
-    STA $0200
-ReadB_Done:
+    STA sprite_player + SPRITE_X
+ReadRight_Done:
+    ;Read A Button
+    ; LDA controller_state_a
+    ; AND #$0000001
+    ; BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
 
-    LDA CONTROLLER1
-    LDA CONTROLLER1
-    LDA CONTROLLER1
-    LDA CONTROLLER1
-    LDA CONTROLLER1
-    LDA CONTROLLER1
+    ; ;Spawn a Bullet
+    ; LDA sprite_player + SPRITE_Y    ; Y position
+    ; STA sprite_bullet + SPRITE_Y
+    ; LDA #2      ; Tile Number
+    ; STA sprite_bullet + SPRITE_TILE
+    ; LDA #0      ; Attributes
+    ; STA sprite_bullet + SPRITE_ATTRIB
+    ; LDA sprite_player + SPRITE_X  ;X position
+    ; STA sprite_bullet + SPRITE_X
 
+; ReadA_Done:
     ;Make the sprites move
     LDA $0204
     CLC 
