@@ -2,6 +2,7 @@
 ReadDown_Done                    = $C0D3
 ReadLeft_Done                    = $C0E3
 ReadRight_Done                   = $C0F3
+ReadA_Done                       = $C110
 vblankwait1                      = $C017
 vblankwait2                      = $C03A
 clrmem                           = $C01D

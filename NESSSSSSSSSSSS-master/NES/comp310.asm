@@ -181,57 +181,58 @@ ReadController:
     LDA controller_state_up
     AND #$00000001
     BEQ ReadUp_Done ; if Controller 1's up button is pressed, execute following lines.
-    LDA sprite_player + SPRITE_Y
+    LDA $0200
     CLC
     ADC #-1
-    STA sprite_player + SPRITE_Y
+    STA $0200
 ReadUp_Done:
 
     ;Read Down Arrow
     LDA controller_state_down
     AND #$00000001
     BEQ ReadDown_Done ; if Controller 1's down button is pressed, execute following lines.
-    LDA sprite_player + SPRITE_Y
+    LDA $0200
     CLC 
     ADC #1
-    STA sprite_player + SPRITE_Y
+    STA $0200
 ReadDown_Done:
 
     ;Read Left Arrow
     LDA controller_state_left
     AND #$00000001
     BEQ ReadLeft_Done ; if Controller 1's left button is pressed, execute following lines.
-    LDA sprite_player + SPRITE_X
+    LDA $0203
     CLC 
     ADC #-1
-    STA sprite_player + SPRITE_X
+    STA $0203
 ReadLeft_Done:
 
     ;Read Right Arrow
     LDA controller_state_right
     AND #$00000001
     BEQ ReadRight_Done ; if Controller 1's right button is pressed, execute following lines.
-    LDA sprite_player + SPRITE_X
+    LDA $0203
     CLC 
     ADC #1
-    STA sprite_player + SPRITE_X
+    STA $0203
 ReadRight_Done:
+
     ;Read A Button
-    ; LDA controller_state_a
-    ; AND #$0000001
-    ; BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
+    LDA controller_state_a
+    AND #$0000001
+    BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
 
-    ; ;Spawn a Bullet
-    ; LDA sprite_player + SPRITE_Y    ; Y position
-    ; STA sprite_bullet + SPRITE_Y
-    ; LDA #2      ; Tile Number
-    ; STA sprite_bullet + SPRITE_TILE
-    ; LDA #0      ; Attributes
-    ; STA sprite_bullet + SPRITE_ATTRIB
-    ; LDA sprite_player + SPRITE_X  ;X position
-    ; STA sprite_bullet + SPRITE_X
+    ;Spawn a Bullet
+    LDA sprite_player + SPRITE_Y      ; Y position
+    STA sprite_bullet + SPRITE_Y
+    LDA #1                           ; Tile Number
+    STA sprite_bullet + SPRITE_TILE
+    LDA #0                           ; Attributes
+    STA sprite_bullet + SPRITE_ATTRIB
+    LDA sprite_player + SPRITE_X     ;X position
+    STA sprite_bullet + SPRITE_X
 
-; ReadA_Done:
+ReadA_Done:
     ;Make the sprites move
     LDA $0204
     CLC 
