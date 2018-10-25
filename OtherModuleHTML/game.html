@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <style>
+            #hero
+            {
+                background: #ff0000;
+                width: 20px;
+                height: 20px;
+                position: absolute;
+
+            }
+        </style>
+    </head>
+    <body>
+        <div id="hero"> </div>
+        <script>
+            
+            var LastLoopRun = 0;
+            var LEFT_KEY = 37;
+            var UP_KEY = 38;
+            var RIGHT_KEY = 39;
+            var DOWN_KEY = 40;
+            var MoveSpeed = 5;
+
+            //Creating the starting point for the player character
+            var hero = new Object();
+            hero.element = 'hero';
+            hero.x = 250;
+            hero.y = 460;
+            var controller = new Object();
+
+            //What to do when different keys are pressed
+            function toggleKey(keyCode, isPressed){
+            //This is here to find out which key codes I need for assigning commands to various keys
+            console.log(keyCode)
+            //Assigning controls to... the controls. (What to do when each key is pressed)
+            if (keyCode == LEFT_KEY){
+                controller.left = isPressed;
+            }
+            if (keyCode == RIGHT_KEY){
+                controller.right = isPressed;
+            }
+            if (keyCode == UP_KEY){
+                controller.up = isPressed;
+            }
+            if (keyCode == DOWN_KEY){
+                controller.down = isPressed;
+            }
+            }
+
+            //Sets the position of the sprite
+            function setPosition(sprite) {
+                var e = document.getElementById(sprite.element);
+                e.style.left = sprite.x + 'px';
+                e.style.top = sprite.y + 'px';
+            }
+            setPosition(hero);
+            //Function that handles movement
+            function handleControls(){
+                if (controller.up == isPressed){
+                    hero.y -= MoveSpeed;
+                }
+                if (controller.down){
+                    hero.y += MoveSpeed;
+                }
+                if (controller.left){
+                    hero.x -= MoveSpeed;
+                }
+                if (controller.right){
+                    hero.x += MoveSpeed;
+                }
+            }
+            //Defines function to update sprite position for movement
+            function showSprites(){
+            setPosition(hero);
+            }
+            //Main game loop, where all the magic happens.
+            function loop() {
+                if (new Date().getTime() - LastLoopRun > 40) {
+                    handleControls();
+                    showSprites();
+                    LastLoopRun = new Date().getTime();
+                }
+                setTimeout('loop();', 2);
+            }
+            //On key press, return information that key is pressed
+            document.onkeydown = function(evt) {
+            toggleKey(evt.keyCode, true);
+            
+            };
+            //On key release, return information that key is released
+            document.onkeyup = function(evt) {
+            toggleKey(evt.keyCode, false);
+            }
+            
+        </script>
+    </body>
+</html>

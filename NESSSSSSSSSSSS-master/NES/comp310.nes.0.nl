@@ -1,7 +1,8 @@
 $C0D3#ReadDown_Done#
 $C0E3#ReadLeft_Done#
+$C132#UpdateBullet_Done#
 $C0F3#ReadRight_Done#
-$C110#ReadA_Done#
+$C11D#ReadA_Done#
 $C017#vblankwait1#
 $C03A#vblankwait2#
 $C01D#clrmem#

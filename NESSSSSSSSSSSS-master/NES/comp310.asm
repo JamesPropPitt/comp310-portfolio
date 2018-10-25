@@ -26,10 +26,16 @@ controller_state_up     .rs 1
 controller_state_down   .rs 1
 controller_state_left   .rs 1
 controller_state_right  .rs 1
+bullet_active .rs 1
 
-    .rsset $0020
+    .rsset $0200
 sprite_player           .rs 4
 sprite_bullet           .rs 4
+sprite_bullet2          .rs 4
+sprite_bullet3          .rs 4
+sprite_bullet4          .rs 4
+sprite_bullet5          .rs 4
+sprite_bullet6          .rs 4
 
     .rsset $0000
 SPRITE_Y                .rs 1
@@ -181,64 +187,87 @@ ReadController:
     LDA controller_state_up
     AND #$00000001
     BEQ ReadUp_Done ; if Controller 1's up button is pressed, execute following lines.
-    LDA $0200
+    LDA sprite_player + SPRITE_Y
     CLC
     ADC #-1
-    STA $0200
+    STA sprite_player + SPRITE_Y
 ReadUp_Done:
 
     ;Read Down Arrow
     LDA controller_state_down
     AND #$00000001
     BEQ ReadDown_Done ; if Controller 1's down button is pressed, execute following lines.
-    LDA $0200
+    LDA sprite_player + SPRITE_Y
     CLC 
     ADC #1
-    STA $0200
+    STA sprite_player + SPRITE_Y
 ReadDown_Done:
 
     ;Read Left Arrow
     LDA controller_state_left
     AND #$00000001
     BEQ ReadLeft_Done ; if Controller 1's left button is pressed, execute following lines.
-    LDA $0203
+    LDA sprite_player + SPRITE_X
     CLC 
     ADC #-1
-    STA $0203
+    STA sprite_player + SPRITE_X
 ReadLeft_Done:
 
     ;Read Right Arrow
     LDA controller_state_right
     AND #$00000001
     BEQ ReadRight_Done ; if Controller 1's right button is pressed, execute following lines.
-    LDA $0203
+    LDA sprite_player + SPRITE_X
     CLC 
     ADC #1
-    STA $0203
+    STA sprite_player + SPRITE_X
 ReadRight_Done:
+
 
     ;Read A Button
     LDA controller_state_a
     AND #$0000001
-    BEQ ReadA_Done ; if Controller 1's A button is pressed, execute following lines.
-
+    BEQ ReadA_Bullet1_Done ; if Controller 1's A button is pressed, execute following lines.
+    ; Spawn a bullet if one is not active
+    LDA bullet_active
+    BNE ReadA_Bullet1_Done
     ;Spawn a Bullet
-    LDA sprite_player + SPRITE_Y      ; Y position
+    LDA sprite_player + SPRITE_Y    ; Y position
     STA sprite_bullet + SPRITE_Y
-    LDA #1                           ; Tile Number
+    LDA #1      ; Tile Number
     STA sprite_bullet + SPRITE_TILE
-    LDA #0                           ; Attributes
+    LDA #0      ; Attributes
     STA sprite_bullet + SPRITE_ATTRIB
-    LDA sprite_player + SPRITE_X     ;X position
+    LDA sprite_player + SPRITE_X  ;X position
     STA sprite_bullet + SPRITE_X
 
-ReadA_Done:
-    ;Make the sprites move
-    LDA $0204
-    CLC 
-    ADC #2
-    STA $0204
 
+ReadA_Bullet1_Done:
+
+    ;Update the bullet
+    LDA bullet_active
+    BEQ UpdateBullet_Done
+    LDA sprite_bullet + SPRITE_Y
+    SEC 
+    SBC #1
+    STA sprite_bullet + SPRITE_Y 
+    BCS ReadA_Bullet2_Done
+    ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
+    LDA #0
+    STA bullet_active
+
+ReadA_Bullet2_Done:
+    ;Update the bullet
+    LDA bullet_active
+    BEQ UpdateBullet_Done
+    LDA sprite_bullet + SPRITE_Y
+    SEC 
+    SBC #1
+    STA sprite_bullet + SPRITE_Y 
+    BCS ReadA_Bullet2_Done
+    ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
+    LDA #0
+    STA bullet_active
 
     ;Copy sprite data to PPU
     LDA #0
