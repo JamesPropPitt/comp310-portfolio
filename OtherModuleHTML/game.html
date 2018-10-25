@@ -21,7 +21,7 @@
             var RIGHT_KEY = 39;
             var DOWN_KEY = 40;
             var MoveSpeed = 5;
-
+ 
             //Creating the starting point for the player character
             var hero = new Object();
             hero.element = 'hero';
@@ -57,7 +57,7 @@
             setPosition(hero);
             //Function that handles movement
             function handleControls(){
-                if (controller.up == isPressed){
+                if (controller.up){
                     hero.y -= MoveSpeed;
                 }
                 if (controller.down){
@@ -92,7 +92,7 @@
             document.onkeyup = function(evt) {
             toggleKey(evt.keyCode, false);
             }
-            
+            loop();
         </script>
     </body>
 </html>
