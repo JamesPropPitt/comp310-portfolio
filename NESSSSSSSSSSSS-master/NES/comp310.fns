@@ -1,9 +1,9 @@
 ; .\comp310.asm
 ReadDown_Done                    = $C0D3
+ReadA_Bullet2_Done               = $C12F
 ReadLeft_Done                    = $C0E3
-UpdateBullet_Done                = $C132
+ReadA_Bullet1_Done               = $C11A
 ReadRight_Done                   = $C0F3
-ReadA_Done                       = $C11D
 vblankwait1                      = $C017
 vblankwait2                      = $C03A
 clrmem                           = $C01D

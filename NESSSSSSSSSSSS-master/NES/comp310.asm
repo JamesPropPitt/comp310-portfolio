@@ -240,13 +240,15 @@ ReadRight_Done:
     STA sprite_bullet + SPRITE_ATTRIB
     LDA sprite_player + SPRITE_X  ;X position
     STA sprite_bullet + SPRITE_X
+    LDA #1
+    STA bullet_active
 
 
 ReadA_Bullet1_Done:
 
     ;Update the bullet
     LDA bullet_active
-    BEQ UpdateBullet_Done
+    BEQ ReadA_Bullet2_Done
     LDA sprite_bullet + SPRITE_Y
     SEC 
     SBC #1
@@ -257,17 +259,17 @@ ReadA_Bullet1_Done:
     STA bullet_active
 
 ReadA_Bullet2_Done:
-    ;Update the bullet
-    LDA bullet_active
-    BEQ UpdateBullet_Done
-    LDA sprite_bullet + SPRITE_Y
-    SEC 
-    SBC #1
-    STA sprite_bullet + SPRITE_Y 
-    BCS ReadA_Bullet2_Done
-    ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
-    LDA #0
-    STA bullet_active
+;     ;Update the bullet
+;     LDA bullet_active
+;     BEQ UpdateBullet_Done
+;     LDA sprite_bullet + SPRITE_Y
+;     SEC 
+;     SBC #1
+;     STA sprite_bullet + SPRITE_Y 
+;     BCS ReadA_Bullet2_Done
+;     ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
+;     LDA #0
+;     STA bullet_active
 
     ;Copy sprite data to PPU
     LDA #0
