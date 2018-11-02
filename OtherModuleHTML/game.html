@@ -3,32 +3,122 @@
         <style>
             #hero
             {
-                background: #ff0000;
+                background: #0dff04;
                 width: 20px;
                 height: 20px;
                 position: absolute;
 
             }
+            #background
+            {
+                background: #008299;
+                width: 800px;
+                height: 600px;
+                background-position: center center;
+                left: 0px;
+                top: 0px;
+            }
+            #bullet
+            {
+                background: #000000;
+                width: 5px;
+                height: 10px;
+                position: absolute;
+            }
+            .snail
+            {
+                background: #ff0000;
+                width: 10px;
+                height: 10px;
+                position: absolute;
+            }
+
         </style>
     </head>
     <body>
+        <div id= "background"></div>
+        <div id="bullet"></div>
         <div id="hero"> </div>
+        <div id="snail"></div>
         <script>
-            
             var LastLoopRun = 0;
             var LEFT_KEY = 37;
             var UP_KEY = 38;
             var RIGHT_KEY = 39;
             var DOWN_KEY = 40;
             var MoveSpeed = 5;
- 
             //Creating the starting point for the player character
             var hero = new Object();
             hero.element = 'hero';
             hero.x = 250;
             hero.y = 460;
+            hero.w = 20;
+            hero.h = 20;
             var controller = new Object();
+            // var snails = new Array();
 
+            //Creating the starting point for the snail character
+            var snail = new Object();
+            snail.element = 'snail';
+            snail.x = 500;
+            snail.y = 300;
+            snail.w = 10;
+            snail.h = 10;
+
+            // //problem area 1
+            function snailMove(){
+                var isMovingForward = true
+                var isMovingUp = true
+                if (isMovingForward == true){
+                    if (snail.x + snail.w < 800){
+                        snail.x +=1;
+                    }
+                }
+                else if (isMovingForward == false){
+                    if (snail.x + snail.w > 800){
+                        snail.x -=1;
+                    } 
+                }
+                if (isMovingUp == true){
+                    if (snail.y + snail.h < 800){
+                        snail.y +=1;
+                    }
+                }
+                else if (MovingUp == false){
+                    if (snail.y + snail.h < 800){
+                        snail.y -=1;
+                    }
+                }
+                if (snail.x < 10)
+                    {
+                    isMovingForward = false;
+                    }
+                else
+                {
+                    isMovingForward = true;
+                }
+                if (snail.y < 10)
+                {
+                    isMovingUp = false;
+                }
+                else
+                {
+                    isMovingUp = true;
+                }
+            }
+            
+            
+            function createSprite(element, x, y, w, h)
+            {
+                var result = new Object();
+                result.element = element;
+                result.x = x;
+                result.y = y;
+                result.w = w;
+                result.h = h;
+                return result;
+
+            }
             //What to do when different keys are pressed
             function toggleKey(keyCode, isPressed){
             //This is here to find out which key codes I need for assigning commands to various keys
@@ -47,8 +137,27 @@
                 controller.down = isPressed;
             }
             }
-
-            //Sets the position of the sprite
+            //Stops the sprite from leaving the screen
+            function restriction(sprite)
+            {
+            if(sprite.x < 20)
+                {
+                sprite.x = 20;
+                }    
+            if (sprite.y < 20)
+                {
+                sprite.y = 20;
+                }
+            if (sprite.x + sprite.w > 800)
+                {
+                sprite.x = 800 - sprite.w;  
+                }
+            if (sprite.y + sprite.h > 600)
+                {
+                sprite.y = 600 - sprite.h;  
+                }    
+            }
+            //Sets the position of the sprite, problem area 2
             function setPosition(sprite) {
                 var e = document.getElementById(sprite.element);
                 e.style.left = sprite.x + 'px';
@@ -70,18 +179,38 @@
                     hero.x += MoveSpeed;
                 }
             }
+            function addSnail(){
+                var elementName = 'snail';
+                var snail = CreateSprite(elementName, 20, 40, 10, 10);
+
+                var element = document.createElement('div');
+                element.id = snail.element;
+                element.className = 'snail';
+                document.children[0].appendChild(element);
+            }
+                
+            //     snails[snails.length] = snail;
+            // }
+            // function updatePositions(){
+            //     snail.y += 4;
+            //     snail.x += getRandom(7) - 3;
+            // }
             //Defines function to update sprite position for movement
             function showSprites(){
             setPosition(hero);
+            restriction(hero);
+            setPosition(snail);
+            snailMove(snail);
             }
             //Main game loop, where all the magic happens.
             function loop() {
-                if (new Date().getTime() - LastLoopRun > 40) {
+                if (new Date().getTime() - LastLoopRun > 24) {
                     handleControls();
+                    // updatePositions();
                     showSprites();
                     LastLoopRun = new Date().getTime();
                 }
-                setTimeout('loop();', 2);
+                setTimeout('loop();', 1);
             }
             //On key press, return information that key is pressed
             document.onkeydown = function(evt) {
