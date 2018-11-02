@@ -55,7 +55,7 @@
             hero.w = 20;
             hero.h = 20;
             var controller = new Object();
-            // var snails = new Array();
+            var snails = new Array();
 
             //Creating the starting point for the snail character
             var snail = new Object();
@@ -180,33 +180,45 @@
                 }
             }
             function addSnail(){
-                var elementName = 'snail';
+                if (getRandom(50) ==0){  
+                var elementName = 'snail' + getRandom(1000000);
                 var snail = CreateSprite(elementName, 20, 40, 10, 10);
 
                 var element = document.createElement('div');
                 element.id = snail.element;
                 element.className = 'snail';
                 document.children[0].appendChild(element);
+
+                snails[snails.length] = snail;
+                }
             }
+            function updatePositions(){
+                for (var i = 0; i < snails.length; i++){
+                snail.y += 4;
+                snail.x += getRandom(7) - 3;
+            }
+        
                 
-            //     snails[snails.length] = snail;
-            // }
-            // function updatePositions(){
-            //     snail.y += 4;
-            //     snail.x += getRandom(7) - 3;
-            // }
-            //Defines function to update sprite position for movement
+            }
             function showSprites(){
             setPosition(hero);
             restriction(hero);
-            setPosition(snail);
-            snailMove(snail);
+            for (var i = 0; i < snails.length; i++){
+                setPosition(snails[i]);
+                }
             }
+            function getRandom(maxSize) {
+                return parseInt(Math.random() * maxSize);
+            
+            //Defines function to update sprite position for movement
+            
+            }
+        
             //Main game loop, where all the magic happens.
             function loop() {
                 if (new Date().getTime() - LastLoopRun > 24) {
                     handleControls();
-                    // updatePositions();
+                    updatePositions();
                     showSprites();
                     LastLoopRun = new Date().getTime();
                 }
@@ -216,7 +228,7 @@
             document.onkeydown = function(evt) {
             toggleKey(evt.keyCode, true);
             
-            };
+            }
             //On key release, return information that key is released
             document.onkeyup = function(evt) {
             toggleKey(evt.keyCode, false);
