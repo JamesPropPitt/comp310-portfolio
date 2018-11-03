@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>COMP330 Lecture 01: Simple Demo</title>
+</head>
+
+<body>
+<!--
+//GARETH: Define a canvas in the page body and call it 'canvas'
+-->
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
+<script>
+    //
+    //GARETH:   This is some boilerplate code that will hide screen edges on the
+    //          browser
+    //
+    document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+    document.body.scroll = "no"; // ie only
+    document.body.style.padding = 0;
+    document.body.style.margin = 0;
+
+    //
+    //GARETH:   setInterval() is the magic glue that makes html pages animate.
+    //          It takes a function() that contains all the code that will get
+    //          executed each iteration and the number of mS between each iteration
+    //          Given that 60fps is 1000mS/60 = 16.666, I use 17
+    //
+    setInterval(function()
+    {
+        //GARETH: get the canvas component from the HTML document and pick up the 2D context
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        //GARETH: set the canvas size to the current window size, else bits wont get drawn to
+        ctx.canvas.width  = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+
+        //GARETH: draw a rectangle that's the size of the screen, this will clear it
+        ctx.fillStyle = 'rgba(32,32,32,255)';
+        ctx.fillRect(0,0,window.innerWidth, window.innerHeight);
+
+        //GARETH:   draw a red rectangle in the top corner of the screen
+        //          note how it doesn't scale when the screen size changes
+        ctx.fillStyle = 'rgba(255,0,0,255)';
+        ctx.fillRect(0,0,200,100);
+    },17);
+
+    //
+    //GARETH:   onMouseMove & window.addEventListener are used together.
+    //          onMouseMove is called whenever the mouse moves
+    //
+    function onMouseMove(event)
+    {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+
+        //GARETH: draw a rectangle at the position of the event passed into the function
+        ctx.fillStyle = 'rgba(0,255,0,255)';
+        ctx.fillRect(event.pageX,event.pageY,10,10);
+    }
+
+    //
+    //GARETH:   register onMouseMove as an event listener to 'mousemove'
+    //          onMouseMove will get called whenever the mouse moves
+    window.addEventListener('mousemove',onMouseMove);
+
+
+</script>

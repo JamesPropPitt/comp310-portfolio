@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #16232c; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="1080" height="720"></canvas>
+<button onclick="setTimeout(GameOver,0);">Start</button>
+<p id="timer"></p>
+<script>
+    //Declaration upon declaration of variables
+	var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var HeroX = 20;
+    var HeroY = 20;
+    var SnailX = canvas.width/2;
+    var SnailY = canvas.height-30;
+    var HorizSpeed = 2;
+    var VertiSpeed = -2;
+    var LastLoopRun = 0;
+    var leftPressed = false;
+    var rightPressed = false;
+    var upPressed = false;
+    var downPressed = false;
+    var snailRadius = 10;
+    var heroWidth = 15;
+    var heroHeight = 10;
+    var snailPoints = 0;
+    var heroPoints = 0;
+    var seconds = 30;
+
+    //This here counts down
+    function Clock(){
+        seconds -= 1;
+        return seconds;
+    }
+    //This tells the website to stop existing
+    function GameOver(){
+        if (Clock() <= 0){
+            alert('GAME OVER, YOU PROBABLY LOST');
+            window.stop();
+        }
+        
+    }
+    //This is creating any number between -3 and 3
+    function Random(){
+        return Math.random(3) - Math.random(3);
+    }
+    //This is the primary loop of the game which draws both the snail character and the player character every 10ms
+    function draw() {
+        ctx.beginPath();
+        ctx.arc(SnailX, SnailY, snailRadius,(snailRadius*2), Math.PI*2);
+        ctx.fillStyle = "indigo";
+        ctx.fill();
+        ctx.closePath();
+        SnailX += HorizSpeed;
+        SnailY += VertiSpeed;
+        if(SnailX + HorizSpeed > canvas.width || SnailX + HorizSpeed < 0) {
+            HorizSpeed = (-HorizSpeed - Random());
+        }
+
+        if(SnailY + VertiSpeed > canvas.height || SnailY + VertiSpeed < 0) {
+            VertiSpeed = (-VertiSpeed - Random());
+        }
+        if(rightPressed && heroWidth< canvas.width-heroWidth) {
+            HeroX+= (HorizSpeed*2);
+        }
+        if(leftPressed && heroWidth > 0) {
+            HeroX-= (HorizSpeed*2);
+        }
+        if(upPressed && heroHeight < canvas.height-heroHeight){
+            HeroY+=(VertiSpeed*2);
+        }
+        else if(downPressed && heroHeight > 0){
+            HeroY-= (VertiSpeed*2);
+        }
+    }
+    //This creates the starting point for the hero, creates the shape for the hero and assigns the colour for the hero
+    function hero(){
+        ctx.beginPath();
+        ctx.arc(HeroX, HeroY, heroWidth, (heroHeight*2), Math.PI*2, false);
+        ctx.fillStyle = "aqua";
+        ctx.fill();
+        ctx.closePath();
+    }
+//Setting it up so the computer listens for these events to be called, then reacting accordingly... 
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+document.getElementById("timer").innerHTML = seconds + "s ";
+
+    //Telling the computer how to handle an event when it is called
+    function keyDownHandler(e) {
+        if(e.keyCode == 39) {
+            rightPressed = true;
+        }
+        else if(e.keyCode == 37) {
+            leftPressed = true;
+        }
+        if(e.keyCode == 38) {
+            upPressed = true;
+        }
+        else if(e.keyCode == 40) {
+            downPressed = true;
+        }
+    }
+    //Same as above but instead of pressing a key, it's releasing a key! Wow!
+    function keyUpHandler(e) {
+        if(e.keyCode == 39) {
+            rightPressed = false;
+        }
+        else if(e.keyCode == 37) {
+            leftPressed = false;
+        }
+        if(e.keyCode == 38) {
+            upPressed = false;
+        }
+        else if(e.keyCode == 40) {
+            downPressed = false;
+        }
+    }
+//Probably a very inefficient way of getting 3 functions to loop constantly throughout the game's duration
+setInterval (draw,10);
+setInterval (hero,10);
+setInterval (Clock, 1000);
+</script>
+
+</body>
+</html>
