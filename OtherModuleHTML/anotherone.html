@@ -11,7 +11,7 @@
 <body>
 
 <canvas id="myCanvas" width="1080" height="720"></canvas>
-<button onclick="setTimeout(GameOver,0);">Start</button>
+<button onclick="setTimeout(GameOver,3000);">Start</button>
 <p id="timer"></p>
 <script>
     //Declaration upon declaration of variables
@@ -34,6 +34,8 @@
     var snailPoints = 0;
     var heroPoints = 0;
     var seconds = 30;
+    var second = 1000;
+    var snailScore = 0;
 
     //This here counts down
     function Clock(){
@@ -44,10 +46,16 @@
     function GameOver(){
         if (Clock() <= 0){
             alert('GAME OVER, YOU PROBABLY LOST');
-            window.stop();
         }
         
     }
+    //A timer that counts down in sets of 2 seconds for some fucking stupid reason
+    function loopTime(){
+        Clock()
+        GameOver()
+        document.getElementById("timer").innerHTML = seconds + "s ";
+        }
+
     //This is creating any number between -3 and 3
     function Random(){
         return Math.random(3) - Math.random(3);
@@ -68,6 +76,14 @@
         if(SnailY + VertiSpeed > canvas.height || SnailY + VertiSpeed < 0) {
             VertiSpeed = (-VertiSpeed - Random());
         }
+    }
+    //This creates the starting point for the hero, creates the shape for the hero and assigns the colour for the hero
+    function hero(){
+        ctx.beginPath();
+        ctx.arc(HeroX, HeroY, heroWidth, (heroHeight*2), Math.PI*2, false);
+        ctx.fillStyle = "aqua";
+        ctx.fill();
+        ctx.closePath();
         if(rightPressed && heroWidth< canvas.width-heroWidth) {
             HeroX+= (HorizSpeed*2);
         }
@@ -81,18 +97,10 @@
             HeroY-= (VertiSpeed*2);
         }
     }
-    //This creates the starting point for the hero, creates the shape for the hero and assigns the colour for the hero
-    function hero(){
-        ctx.beginPath();
-        ctx.arc(HeroX, HeroY, heroWidth, (heroHeight*2), Math.PI*2, false);
-        ctx.fillStyle = "aqua";
-        ctx.fill();
-        ctx.closePath();
-    }
 //Setting it up so the computer listens for these events to be called, then reacting accordingly... 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
-document.getElementById("timer").innerHTML = seconds + "s ";
+
 
     //Telling the computer how to handle an event when it is called
     function keyDownHandler(e) {
@@ -127,7 +135,8 @@ document.getElementById("timer").innerHTML = seconds + "s ";
 //Probably a very inefficient way of getting 3 functions to loop constantly throughout the game's duration
 setInterval (draw,10);
 setInterval (hero,10);
-setInterval (Clock, 1000);
+setInterval (loopTime, second);
+
 </script>
 
 </body>
