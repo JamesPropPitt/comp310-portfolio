@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -37,7 +40,12 @@
     var second = 1000;
     var snailScore = 0;
     var grid = [(270,180), (540,180),(810,180),(1080,180),(270,360),(540,360),(810,360),(1080,360),(270,540),(540,540),(810,540),(1080,540),(270,720),(540,720),(810,720),(1080,720)];
-
+    var snailLocation = ctx.getImageData(SnailX, SnailY, snailRadius, snailRadius);
+    red = snailLocation.data[0];
+    green = snailLocation.data[1];
+    blue = snailLocation.data[2];
+    alpha = snailLocation.data[3];
+    
     //This here counts down
     function Clock(){
         seconds -= 1;
@@ -52,7 +60,7 @@
     }
     //A timer that counts down in sets of 2 seconds for some fucking stupid reason
     function loopTime(){
-        Clock()
+        //Clock()
         GameOver()
         document.getElementById("timer").innerHTML = seconds + "s ";
         }
@@ -68,6 +76,7 @@
         ctx.fillStyle = "indigo";
         ctx.fill();
         ctx.closePath();
+
         SnailX += HorizSpeed;
         SnailY += VertiSpeed;
         if(SnailX + HorizSpeed > canvas.width || SnailX + HorizSpeed < 0) {
