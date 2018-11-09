@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<canvas id="myCanvas" width="1080" height="720"></canvas>
+<canvas id="myCanvas" width="1920" height="900"></canvas>
 <button onclick="setTimeout(GameOver,3000);">Start</button>
 <p id="timer"></p>
 <script>
@@ -26,6 +26,7 @@
     var SnailY = canvas.height-30;
     var HorizSpeed = 2;
     var VertiSpeed = -2;
+    var movementSpeed = 4;
     var LastLoopRun = 0;
     var leftPressed = false;
     var rightPressed = false;
@@ -38,13 +39,11 @@
     var heroPoints = 0;
     var seconds = 30;
     var second = 1000;
-    var snailScore = 0;
-    var grid = [(270,180), (540,180),(810,180),(1080,180),(270,360),(540,360),(810,360),(1080,360),(270,540),(540,540),(810,540),(1080,540),(270,720),(540,720),(810,720),(1080,720)];
-    var snailLocation = ctx.getImageData(SnailX, SnailY, snailRadius, snailRadius);
-    red = snailLocation.data[0];
-    green = snailLocation.data[1];
-    blue = snailLocation.data[2];
-    alpha = snailLocation.data[3];
+    var snailPosX = SnailX;
+    var snailPosY = SnailY;
+    var snailScore = [];
+    
+    
     
     //This here counts down
     function Clock(){
@@ -81,6 +80,7 @@
         SnailY += VertiSpeed;
         if(SnailX + HorizSpeed > canvas.width || SnailX + HorizSpeed < 0) {
             HorizSpeed = (-HorizSpeed - Random());
+
         }
 
         if(SnailY + VertiSpeed > canvas.height || SnailY + VertiSpeed < 0) {
@@ -95,16 +95,16 @@
         ctx.fill();
         ctx.closePath();
         if(rightPressed && heroWidth< canvas.width-heroWidth) {
-            HeroX+= (HorizSpeed*2);
+            HeroX+= movementSpeed;
         }
         if(leftPressed && heroWidth > 0) {
-            HeroX-= (HorizSpeed*2);
+            HeroX-= movementSpeed;
         }
         if(upPressed && heroHeight < canvas.height-heroHeight){
-            HeroY+=(VertiSpeed*2);
+            HeroY-=movementSpeed;
         }
         else if(downPressed && heroHeight > 0){
-            HeroY-= (VertiSpeed*2);
+            HeroY+= movementSpeed;
         }
     }
 //Setting it up so the computer listens for these events to be called, then reacting accordingly... 

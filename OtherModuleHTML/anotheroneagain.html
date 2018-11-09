@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #000000; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="1920" height="800" ></canvas>
+
+<script>
+//Declarations of all variables
+var width = screen.width;
+var height = screen.height;
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+var laneHeight = height/8;
+var laneWidth = width;
+var laneX = 0;
+var lane1Y = (laneHeight*2);
+var lane2Y = (laneHeight*5);
+var screenSize = [];
+var spacePressed = false;
+var F11Pressed = false;
+var contestant1X = 0;
+var contestant1Y = (laneHeight*2 + (laneHeight/2));
+var contestant2X = 0;
+var contestant2Y = (laneHeight*5 + (laneHeight/2));
+var horizSpeed = 0.5;
+var vertiSpeed = 0.5;
+var horizSpeed2 = 0.5;
+var vertiSpeed2 = 0.5;
+var winner = 0;
+var Purple = 0;
+var Green = 0;
+var PPressed = false;
+var GPressed = false;
+var restart = 0;
+//Sets the size of the screen to the user's size of the screen
+myCanvas.height = height;
+myCanvas.width = width;
+
+
+
+//Only start when F11 is pressed
+function Start(){
+    if (F11Pressed == false)
+    {
+        ctx.font="80px Verdana";
+        ctx.fillStyle="indigo";
+        ctx.fillText("Press F11 to play",(width/2)-320,(height/2)+40);
+    }
+    if (F11Pressed == true)
+    {
+        ctx.beginPath();
+        ctx.fillStyle = "#000000";
+        ctx.fillRect((width/2)-320,(height/2-140)+40,800,180);
+        if(GPressed == false)
+        {
+            if(PPressed == false)
+            {
+                if(winner ==0)
+                {
+                    draw();
+                }
+            }
+        }
+        if(GPressed == true){
+            Purple = 0;
+            Green = 1;
+            winner = 0;
+            restart = 1;
+        }
+        if(PPressed == true){
+            Purple = 1;
+            Green = 0;
+            winner = 0;
+            restart = 1;
+        }        
+        
+    }
+        
+}
+//Gimme a random a number between -3 and 3
+function Random(){
+    return Math.random(3) - Math.random(3);
+}
+//Main loop of game, if F11 is pressed execute this.
+function draw(){
+    if(restart == 1){
+        ctx.fillRect(0,0,canvas.width, canvas.height);
+        restart = 0;
+        //Create the track!
+        ctx.beginPath();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(laneX,lane1Y,laneWidth,laneHeight);
+        ctx.fillRect(laneX,lane2Y,laneWidth,laneHeight);
+        contestant1X = 0;
+        contestant1Y = (laneHeight*2 + (laneHeight/2));
+        contestant2X = 0;
+        contestant2Y = (laneHeight*5 + (laneHeight/2));
+    }
+        ctx.beginPath();
+        ctx.arc(contestant1X, contestant1Y, 15,20, Math.PI*2);
+        ctx.fillStyle = "indigo";
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.arc(contestant2X, contestant2Y, 15,20, Math.PI*2);
+        ctx.fillStyle = "green";
+        ctx.fill();
+        ctx.closePath();
+
+        //Purple movement
+        contestant1X += (horizSpeed +Random());
+        contestant1Y += (vertiSpeed +Random());
+        //If purple hits the roof, go down
+        if(contestant1Y + horizSpeed > laneWidth  || contestant1Y + vertiSpeed < 0) {
+            vertiSpeed = (+vertiSpeed - Random());
+        }
+        //If purple hits the floor, go up
+        if(contestant1Y + vertiSpeed > laneHeight || contestant1Y + vertiSpeed < 0) {
+            vertiSpeed = (-vertiSpeed - Random());
+        }
+        //Green movement
+        contestant2X += (horizSpeed2 +Random());
+        contestant2Y += (vertiSpeed2 +Random());
+        //If green hits the roof, go down
+        if(contestant2Y + vertiSpeed2 < (laneHeight*5)  || contestant2Y - vertiSpeed2 < 0) {
+            vertiSpeed2 = (+vertiSpeed2 - Random());
+        }
+        //If green hits the roof, go up
+        if(contestant2Y + vertiSpeed2 > (laneHeight*4) || contestant2Y + vertiSpeed2 < 0) {
+            vertiSpeed2 = (-vertiSpeed2 - Random());
+        }
+        //If purple wins set the winner value to 1 and print Purple wins! + You win if you voted Purple
+        if(contestant1X >=laneWidth){
+            if(winner == 0){
+                ctx.font="80px Verdana";
+                ctx.fillStyle="red";
+                if(purple == 0){
+                    ctx.fillText("Purple wins! Bad luck!", 800, 400);
+                }
+                if(purple == 1){
+                    ctx.fillText("Purple wins! Good job!", 800, 400);
+                }
+                winner = 1;
+                ctx.font="80px Verdana";
+                ctx.fillStyle="indigo";
+                ctx.fillText("Press G for Green or P for Purple",300, 300);
+            }
+            
+        }
+        //If green wins set the winner value to 1 and print Green wins! + You win if you voted Green
+        if(contestant2X >=laneWidth){
+            if(winner == 0){
+                ctx.font="80px Verdana";
+                ctx.fillStyle="red";
+                if(Green == 0){
+                    ctx.fillText("Green wins! Bad luck!", 800,800);
+                }
+                if(Green == 1){
+                    ctx.fillText("Green wins! Good job!", 800,800);
+                }
+                winner = 1;
+                ctx.font="80px Verdana";
+                ctx.fillStyle="indigo";
+                ctx.fillText("Press G for Green or P for Purple",300, 900);
+                }
+            }
+        
+        
+    }
+
+
+//Setting it up so the computer listens for these events to be called, then reacting accordingly... 
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
+ //Telling the computer how to handle an event when it is called
+ function keyDownHandler(e) {
+        if(e.keyCode == 122) {
+            F11Pressed = true;
+        }
+        if(e.keyCode == 32) {
+            spacePressed = true;
+        }
+        if(e.keyCode == 71){
+            GPressed = true;
+        }
+        if(e.keyCode == 80) {
+            PPressed = true;
+        }
+    }
+    //Same as above but instead of pressing a key, it's releasing a key! Wow!
+    function keyUpHandler(e) {
+        if(e.keyCode == 32) {
+            spacePressed = false;
+        }
+        if(e.keyCode == 71) {
+            GPressed = false;
+        }
+        if(e.keyCode ==80) {
+            PPressed = false;
+        }
+    }
+
+//Probably a very inefficient way of getting 3 functions to loop constantly throughout the game's duration
+setInterval(Start,1);
+</script>
+
+</body>
+</html>
