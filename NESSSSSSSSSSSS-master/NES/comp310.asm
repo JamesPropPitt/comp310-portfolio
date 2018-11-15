@@ -17,6 +17,11 @@ OAMDMA    = $4014
 CONTROLLER1 = $4016
 CONTROLLER2 = $4017
 
+ENEMY_SQUAD_WIDTH       = 6
+ENEMY_SQUAD_HEIGHT      = 4
+NUM_ENEMIES             = ENEMY_SQUAD_HEIGHT * ENEMY_SQUAD_WIDTH
+ENEMY_SPACING           = 16
+
     .rsset $0010
 controller_state_a      .rs 1
 controller_state_b      .rs 1
@@ -26,22 +31,22 @@ controller_state_up     .rs 1
 controller_state_down   .rs 1
 controller_state_left   .rs 1
 controller_state_right  .rs 1
-bullet_active .rs 1
-
+bullet_active           .rs 1
+temp_x                  .rs 1 
+temp_y                  .rs 1
+enemy_info              .rs 4 * NUM_ENEMIES
     .rsset $0200
 sprite_player           .rs 4
 sprite_bullet           .rs 4
-sprite_bullet2          .rs 4
-sprite_bullet3          .rs 4
-sprite_bullet4          .rs 4
-sprite_bullet5          .rs 4
-sprite_bullet6          .rs 4
+sprite_enemy            .rs 4 * NUM_ENEMIES
 
     .rsset $0000
 SPRITE_Y                .rs 1
 SPRITE_TILE             .rs 1
 SPRITE_ATTRIB           .rs 1
 SPRITE_X                .rs 1
+ENEMY_SPEED             .rs 1
+
 
 
     .bank 0
@@ -151,6 +156,43 @@ vblankwait2:
     LDA #190    ;X position
     STA $0207
 
+    ; initialise enemies
+    LDX #0
+    LDA #ENEMY_SQUAD_HEIGHT * ENEMY_SPACING
+    STA temp_y
+InitEnemies_LoopY:
+    LDA #ENEMY_SQUAD_WIDTH * ENEMY_SPACING
+    STA temp_x
+InitEnemies_LoopX:
+; Accumulator = temp_x here
+    STA sprite_enemy + SPRITE_X, x
+    LDA temp_y 
+    STA sprite_enemy+SPRITE_Y, x 
+    LDA #2
+    STA sprite_enemy+SPRITE_TILE, x 
+    LDA #0
+    STA sprite_enemy+SPRITE_ATTRIB, x
+    LDA #1
+    STA enemy_info+ENEMY_SPEED, x
+    ;Increment X by 4
+    INX
+    INX
+    INX
+    INX
+    ;check x value in loop
+    LDA temp_x 
+    SEC 
+    SBC #ENEMY_SPACING
+    STA temp_x
+    BNE InitEnemies_LoopX
+    ; check y value in loop
+    LDA temp_y
+    SEC
+    SBC #ENEMY_SPACING 
+    STA temp_y
+    BNE InitEnemies_LoopY
+
+
     LDA #%10000000 ; Enable Non Maskable interrupt(NMI)
     STA PPUCTRL
 
@@ -251,7 +293,7 @@ ReadA_Bullet1_Done:
     BEQ ReadA_Bullet2_Done
     LDA sprite_bullet + SPRITE_Y
     SEC 
-    SBC #1
+    SBC #3
     STA sprite_bullet + SPRITE_Y 
     BCS ReadA_Bullet2_Done
     ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
@@ -259,19 +301,37 @@ ReadA_Bullet1_Done:
     STA bullet_active
 
 ReadA_Bullet2_Done:
-;     ;Update the bullet
-;     LDA bullet_active
-;     BEQ UpdateBullet_Done
-;     LDA sprite_bullet + SPRITE_Y
-;     SEC 
-;     SBC #1
-;     STA sprite_bullet + SPRITE_Y 
-;     BCS ReadA_Bullet2_Done
-;     ; If the carry flag has been set then skip to ReadA_Bullet2_Done (fire the next bullet)
-;     LDA #0
-;     STA bullet_active
 
-    ;Copy sprite data to PPU
+    ;update enemies
+    LDX #(NUM_ENEMIES -1)*4
+    
+UpdateEnemies_Loop:
+    LDA sprite_enemy+SPRITE_X, x 
+    CLC
+    ADC enemy_info+ENEMY_SPEED, x
+    STA sprite_enemy + SPRITE_X, x
+    CMP #256 - ENEMY_SPACING
+    BCS UpdateEnemies_Reverse
+    CMP #ENEMY_SPACING
+    BCC UpdateEnemies_Reverse
+    JMP UpdateEnemies_NoReverse
+UpdateEnemies_Reverse:
+    ;reverse direction
+    LDA #0
+    SEC
+    SBC enemy_info+ENEMY_SPEED, x 
+    STA enemy_info+ENEMY_SPEED, x 
+
+UpdateEnemies_NoReverse:
+    DEX
+    DEX
+    DEX
+    DEX
+    BPL UpdateEnemies_Loop
+
+
+
+    ;copy sprite data to the ppu
     LDA #0
     STA OAMADDR
     LDA #$02
