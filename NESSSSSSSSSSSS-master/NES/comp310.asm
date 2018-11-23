@@ -21,6 +21,10 @@ ENEMY_SQUAD_WIDTH       = 6
 ENEMY_SQUAD_HEIGHT      = 4
 NUM_ENEMIES             = ENEMY_SQUAD_HEIGHT * ENEMY_SQUAD_WIDTH
 ENEMY_SPACING           = 16
+ENEMY_HITBOX_WIDTH      = 8
+ENEMY_HITBOX_HEIGHT     = 8
+BULLET_HITBOX_WIDTH     = 8
+BULLET_HITBOX_HEIGHT    = 8
 
     .rsset $0010
 controller_state_a      .rs 1
@@ -46,6 +50,7 @@ SPRITE_TILE             .rs 1
 SPRITE_ATTRIB           .rs 1
 SPRITE_X                .rs 1
 ENEMY_SPEED             .rs 1
+ENEMY_ALIVE             .rs 1
 
 
 
@@ -174,6 +179,7 @@ InitEnemies_LoopX:
     STA sprite_enemy+SPRITE_ATTRIB, x
     LDA #1
     STA enemy_info+ENEMY_SPEED, x
+    STA enemy_info+ENEMY_ALIVE, x
     ;Increment X by 4
     INX
     INX
@@ -306,6 +312,9 @@ ReadA_Bullet2_Done:
     LDX #(NUM_ENEMIES -1)*4
     
 UpdateEnemies_Loop:
+    ;Check if enemy is alive
+    LDA enemy_info+ENEMY_ALIVE, x
+    BEQ UpdateEnemies_Next
     LDA sprite_enemy+SPRITE_X, x 
     CLC
     ADC enemy_info+ENEMY_SPEED, x
@@ -323,6 +332,39 @@ UpdateEnemies_Reverse:
     STA enemy_info+ENEMY_SPEED, x 
 
 UpdateEnemies_NoReverse:
+    ; check collision with bullet
+    LDA sprite_enemy+SPRITE_X, x                            ; calculate x_enemy - width_bullet (x1 - w2) 
+    SEC 
+    SBC #BULLET_HITBOX_WIDTH                               ; assume w2 = 8
+    CMP sprite_bullet + SPRITE_X                           ; compare with x_bullet (x2)
+    BCS UpdateEnemies_NoCollision                          ; Branch if x1-w2 >= x2
+    CLC
+    ADC #BULLET_HITBOX_WIDTH + ENEMY_HITBOX_WIDTH          ; calculate x_enemy + w_enemy (x1+w1), asssuming w1 = 8
+    CMP sprite_bullet+ SPRITE_X                            ; compare with x_bullet (x2)
+    BCC UpdateEnemies_NoCollision                          ; Branching if x1+w1 < x2
+
+    LDA sprite_enemy+SPRITE_Y, x                           ; calculate y_enemy - height_bullet (y1 - h2) 
+    SEC 
+    SBC #BULLET_HITBOX_HEIGHT                              ; assume h2 = 8
+    CMP sprite_bullet + SPRITE_Y                           ; compare with y_bullet (y2)
+    BCS UpdateEnemies_NoCollision                          ; Branch if y1-h2 >= y2
+    CLC
+    ADC #BULLET_HITBOX_HEIGHT + ENEMY_HITBOX_HEIGHT        ; calculate y_enemy + h_enemy (y1+h1), asssuming h1 = 8
+    CMP sprite_bullet+ SPRITE_Y                            ; compare with y_bullet (y2)
+    BCC UpdateEnemies_NoCollision                          ; Branching if y1+h1 < y2
+
+    ; Handle Collision
+    LDA #0
+    STA bullet_active                                      ; destroy the bullet
+    STA enemy_info+ENEMY_ALIVE, x                          ; destroy the enemy
+    LDA #$FF 
+    STA sprite_bullet+ SPRITE_Y
+    STA sprite_enemy + SPRITE_Y, x 
+
+
+UpdateEnemies_NoCollision:
+UpdateEnemies_Next:
+
     DEX
     DEX
     DEX
