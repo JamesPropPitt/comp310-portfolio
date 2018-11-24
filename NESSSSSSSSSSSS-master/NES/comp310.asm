@@ -330,8 +330,8 @@ UpdateEnemies_Reverse:
     SEC
     SBC enemy_info+ENEMY_SPEED, x 
     STA enemy_info+ENEMY_SPEED, x 
-
 UpdateEnemies_NoReverse:
+CheckCollisionWithEnemy .macro 
     ; check collision with bullet
     LDA sprite_enemy+SPRITE_X, x                            ; calculate x_enemy - width_bullet (x1 - w2) 
     SEC 
@@ -363,6 +363,11 @@ UpdateEnemies_NoReverse:
 
 
 UpdateEnemies_NoCollision:
+    .endm
+    
+    ;check collision with bullet
+    CheckCollisionWithEnemy
+    
 UpdateEnemies_Next:
 
     DEX
